@@ -30,16 +30,6 @@ export default {
       this.$emit('removeToDo')
     },
     editToDoBox(targetValue) {
-      /*
-      this.$emit('changeToDoBox', {
-        done: this.isLocalDone,
-        content: this.content,
-        category: this.category
-      })*/
-      
-      console.log(targetValue.checked)
-      console.log(targetValue.value)
-      
       this.$emit('update:modelValue', targetValue.checked)
     }
   },
@@ -64,6 +54,7 @@ export default {
   emits: ["removeToDo", "update:modelValue"],
   mounted() {
     this.isLocalDone = this.done
-    }
+  },
+
 }
 </script>

@@ -5,7 +5,7 @@
     <section class="greeting">
 
       <h2 class="title">
-        whats up, <input type="text" placeholder="Your name here" v-model="name" />
+        whats up, {{name}} <!--<input type="text" placeholder="Your name here" v-model="name" />-->
       </h2>
 
     </section>
@@ -45,7 +45,7 @@
         <div v-for="todo in todos_asc" :class="`todo-item ${todo.done && 'done'}`">
 
           <ToDoItem v-model="todo.done" :category="todo.category" :content="todo.content"
-            @removeToDo="removeToDo(todo.content)"></ToDoItem>
+            @removeToDo="$store.dispatch('removeToDo', todo.content)"></ToDoItem>
         </div>
 
       </div>
@@ -66,8 +66,6 @@ export default {
   },
   data() {
     return {
-      todos: [],
-      name: "",
       input_content: "",
       input_category: "",
       todoCheck: false
@@ -78,19 +76,12 @@ export default {
       if (this.input_content.trim() === '' || this.input_category === null) {
         return
       }
-      this.todos.push({
-        content: this.input_content,
-        category: this.input_category,
-        done: false,
-        createdAt: new Date().getTime()
-      })
+      this.$store.dispatch("addToDo", {content: this.input_content, category: this.input_category})
       this.input_content = ''
       this.input_category = null
     },
 
     removeToDo(content) {
-      //Loops through all todo's, checks if the todo is equal to the selected to do to delete, 
-      //fills todos array with all the todo's except the one we selected
       this.todos = this.todos.filter(t => t.content !== content)
     },
 
@@ -105,7 +96,10 @@ export default {
   },
   computed: {
     todos_asc() {
-      return this.todos.sort((a, b) => b.createdAt - a.createdAt)
+      return this.$store.state.todos.sort((a, b) => b.createdAt - a.createdAt)
+    },
+    name() {
+      return this.$store.state.name
     }
   },
   watch: {
@@ -114,14 +108,10 @@ export default {
         localStorage.setItem('todos', JSON.stringify(newTodo))
       },
       deep: true
-    },
-    name(newName) {
-      localStorage.setItem('name', newName)
     }
   },
   mounted() {
-    this.name = localStorage.getItem('name') || ''
-    this.todos = JSON.parse(localStorage.getItem('todos')) || []
+    this.$store.dispatch("loadLocalToDos")
   }
 }
 </script>
